@@ -1,0 +1,27 @@
+{
+  "name": "infrastructure-sdk",
+  "version": "0.0.1",
+  "description": "infrastructure code for mtg processor",
+  "keywords": [
+    "mtg",
+    "aws",
+    "cdk"
+  ],
+  "author": "dills122 <dylansteele57@gmail.com>",
+  "homepage": "",
+  "license": "MIT",
+  "main": "lib/infrastructure-sdk.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "dependencies": {
+    "aws-cdk": "^1.49.1"
+  }
+}
