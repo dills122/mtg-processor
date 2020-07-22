@@ -10,7 +10,7 @@ async function ExecuteBulkInsert() {
     names.forEach((name) => {
         db.insert({
             name
-        }, (err, doc) => {
+        }, (err) => {
             if (!err) {
                 console.log('local inserted');
             }
@@ -19,5 +19,5 @@ async function ExecuteBulkInsert() {
 }
 
 (async () => {
-    await ExecuteBulkInsert()
+    await ExecuteBulkInsert();
 })();

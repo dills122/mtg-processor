@@ -38,7 +38,7 @@ class ImageProcessor {
             return callback();
         }).catch((err) => {
             return callback(err);
-        })
+        });
     }
 
     extractText(callback) {
@@ -57,4 +57,4 @@ module.exports = {
         return new ImageProcessor(params);
     },
     dependencies
-}
+};
