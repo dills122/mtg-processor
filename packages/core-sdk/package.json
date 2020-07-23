@@ -4,11 +4,13 @@
   "description": "a mtg ocr app for documenting a collection",
   "main": "dist/index.js",
   "scripts": {
-    "coverage": "nyc -r lcov -e .ts -x \"*.test.ts\" npm run test",
+    "coverage": "nyc -r lcov -e .js -x \"*.spec.js\" npm run test",
+    "coverage:ts": "nyc -r lcov -e .ts -x \"*.test.ts\" npm run test",
+    "coverage:js": "nyc -r lcov -e .js -x \"*.spec.js\" npm run test",
     "compile": "tsc",
     "test": "mocha \"./test/**/*.spec.js\"",
     "test:js": "mocha \"./test/**/*.spec.js\"",
-    "test:ts": "mocha -r ts-node/register tests/**/*.test.ts",
+    "test:ts": "mocha -r ts-node/register tests/**/*.spec.ts",
     "watch": "tsc -w"
   },
   "keywords": [
