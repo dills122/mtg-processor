@@ -19,9 +19,14 @@
     "lib"
   ],
   "scripts": {
-    "test": "echo No Tests Yet"
+    "test": "echo No Tests Yet",
+    "compile": "tsc",
+    "watch": "tsc -w"
   },
   "dependencies": {
     "aws-cdk": "^1.49.1"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.7"
   }
 }

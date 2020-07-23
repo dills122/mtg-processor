@@ -4,7 +4,9 @@
   "description": "a mtg ocr app for documenting a collection",
   "main": "index.js",
   "scripts": {
-    "test": "mocha \"./test/**/*.spec.js\""
+    "test": "mocha \"./test/**/*.spec.js\"",
+    "compile": "tsc",
+    "watch": "tsc -w"
   },
   "keywords": [
     "mtg",
@@ -41,6 +43,7 @@
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
     "proxyquire": "^2.1.0",
-    "sinon": "^7.3.2"
+    "sinon": "^7.3.2",
+    "typescript": "^3.9.7"
   }
 }
