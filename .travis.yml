@@ -1,0 +1,23 @@
+sudo: required
+language: node_js
+node_js: 
+  - "stable"
+
+# configure Travis to run on-push builds only on PR-recipient branches
+branches:
+  only:
+    # long-lived branches
+    - master
+    - develop
+
+before_install:
+  - npm install -g yarn
+  - yarn global add lerna
+
+install:
+  - npx lerna bootstrap
+
+cache:
+  directories:
+    - node_modules
+    - "$HOME/.npm"
