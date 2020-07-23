@@ -62,3 +62,9 @@ typings/
 .next
 
 yarn.lock
+
+secure.config.js
+
+tsconfig.tsbuildinfo
+
+/packages/**/dist
