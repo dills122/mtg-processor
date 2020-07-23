@@ -2,19 +2,7 @@ const _ = require('lodash');
 const async = require("async");
 const logger = require('../logger/log');
 const joi = require("@hapi/joi");
-
-const config = {
-    remoteMatch: {
-        twoBit: .75,
-        fourBit: .70,
-        stringCompare: .75
-    },
-    dbMatch: {
-        twoBit: .92,
-        fourBit: .85,
-        stringCompare: .92
-    }
-};
+const config = require('./constants');
 
 const dependencies = {
     CardHashes: require("../rds").CardHashes,
@@ -79,12 +67,11 @@ class ProcessHashes {
         });
         let comparisonResultsList = [];
         async.each(cards, (card, cb) => {
-            let url = card.imgUrl;
+            const { url, setName } = card;
             dependencies.Hash.HashImage(url, (err, remoteImageHash) => {
                 if (err) {
                     return cb(err);
                 }
-                let setName = card.setName;
                 this._insertCardHash(remoteImageHash, setName);
                 let comparisonResults = dependencies.Hash.CompareHash(this.localHash, remoteImageHash);
                 if (!_.isEmpty(comparisonResults)) {
