@@ -19,7 +19,7 @@
     "lib"
   ],
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "echo No Tests Yet"
   },
   "dependencies": {
     "aws-cdk": "^1.49.1"
