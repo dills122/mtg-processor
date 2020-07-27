@@ -68,3 +68,4 @@ secure.config.js
 tsconfig.tsbuildinfo
 
 /packages/**/dist
+/packages/**/types
