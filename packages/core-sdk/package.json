@@ -1,9 +1,10 @@
 {
   "name": "mtg-card-analyzer",
-  "version": "0.0.1-alpha.0",
+  "version": "0.0.2-alpha.0",
   "description": "a mtg ocr app for documenting a collection",
-  "main": "dist/index.js",
+  "main": "src/index.js",
   "scripts": {
+    "build": "npm run compile",
     "coverage": "nyc -r lcov -e .js -x \"*.spec.js\" npm run test",
     "coverage:ts": "nyc -r lcov -e .ts -x \"*.test.ts\" npm run test",
     "coverage:js": "nyc -r lcov -e .js -x \"*.spec.js\" npm run test",
@@ -31,8 +32,8 @@
     "image-hash": "^3.5.1",
     "image-size": "^0.7.3",
     "image-to-base64": "^2.0.1",
-    "jimp": "^0.6.4",
-    "lodash": "^4.17.15",
+    "jimp": "^0.14.0",
+    "lodash": "^4.17.19",
     "meow": "^5.0.0",
     "mysql": "^2.17.1",
     "nedb": "^1.8.0",
