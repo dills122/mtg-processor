@@ -7,7 +7,7 @@
     "declaration": true,
     "declarationDir": "./types",
     "strict": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "strictNullChecks": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
