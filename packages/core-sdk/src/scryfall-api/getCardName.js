@@ -1,6 +1,8 @@
 const request = require('request-promise-native');
-const log = require('../logger/log');
-const logger = log.create({
+const {
+    default: Logger
+} = require('../logger/log');
+const logger = new Logger({
     isPretty: true
 });
 const dependencies = {

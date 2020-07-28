@@ -2,7 +2,9 @@ const _ = require('lodash');
 const async = require("async");
 const joi = require("@hapi/joi");
 const FuzzySet = require('fuzzyset.js');
-const logger = require('../logger/log');
+const {
+    default: Logger
+} = require('../logger/log');
 
 const config = {
     highConfidence: .95,
@@ -28,7 +30,7 @@ class MatchName {
         }
         _.assign(this, params);
         if (!this.logger) {
-            this.logger = logger.create({
+            this.logger = new Logger({
                 isPretty: false
             });
         }

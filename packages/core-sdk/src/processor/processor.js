@@ -5,7 +5,9 @@ const {
 } = require("util");
 const joi = require("@hapi/joi");
 
-const logger = require('../logger/log');
+const {
+    default: Logger
+} = require('../logger/log');
 const dependencies = {
     ImageProcessor: require("../image-processing").ImageProcessor,
     FileIO: require("../file-io"),
@@ -31,7 +33,7 @@ class Processor {
         this.imagePaths = {};
         this.extractedText = {};
         this.matcherResults = [];
-        this.logger = logger.create({
+        this.logger = new Logger({
             isPretty: this.isPretty
         });
     }
