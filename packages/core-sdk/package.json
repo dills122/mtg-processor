@@ -24,8 +24,6 @@
   "license": "MIT",
   "dependencies": {
     "@hapi/joi": "^15.0.3",
-    "@types/bunyan": "^1.8.6",
-    "@types/lodash": "^4.14.158",
     "app-root-path": "^2.2.1",
     "async": "^3.1.0",
     "bunyan": "^1.8.12",
@@ -49,6 +47,9 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "@types/bunyan": "^1.8.6",
+    "@types/lodash": "^4.14.158",
+    "@types/uuid": "^8.0.0",
     "@types/node": "^14.0.26",
     "chai": "^4.2.0",
     "mocha": "^8.0.1",

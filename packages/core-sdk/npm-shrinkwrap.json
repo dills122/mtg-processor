@@ -1,6 +1,6 @@
 {
 	"name": "mtg-card-analyzer",
-	"version": "0.0.2-alpha.0",
+	"version": "0.0.3-alpha.0",
 	"lockfileVersion": 1,
 	"requires": true,
 	"dependencies": {
@@ -764,6 +764,7 @@
 			"version": "1.8.6",
 			"resolved": "https://registry.npmjs.org/@types/bunyan/-/bunyan-1.8.6.tgz",
 			"integrity": "sha512-YiozPOOsS6bIuz31ilYqR5SlLif4TBWsousN2aCWLi5233nZSX19tFbcQUPdR7xJ8ypPyxkCGNxg0CIV5n9qxQ==",
+			"dev": true,
 			"requires": {
 				"@types/node": "*"
 			}
@@ -777,12 +778,20 @@
 		"@types/lodash": {
 			"version": "4.14.158",
 			"resolved": "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.158.tgz",
-			"integrity": "sha512-InCEXJNTv/59yO4VSfuvNrZHt7eeNtWQEgnieIA+mIC+MOWM9arOWG2eQ8Vhk6NbOre6/BidiXhkZYeDY9U35w=="
+			"integrity": "sha512-InCEXJNTv/59yO4VSfuvNrZHt7eeNtWQEgnieIA+mIC+MOWM9arOWG2eQ8Vhk6NbOre6/BidiXhkZYeDY9U35w==",
+			"dev": true
 		},
 		"@types/node": {
 			"version": "14.0.26",
 			"resolved": "https://registry.npmjs.org/@types/node/-/node-14.0.26.tgz",
-			"integrity": "sha512-W+fpe5s91FBGE0pEa0lnqGLL4USgpLgs4nokw16SrBBco/gQxuua7KnArSEOd5iaMqbbSHV10vUDkJYJJqpXKA=="
+			"integrity": "sha512-W+fpe5s91FBGE0pEa0lnqGLL4USgpLgs4nokw16SrBBco/gQxuua7KnArSEOd5iaMqbbSHV10vUDkJYJJqpXKA==",
+			"dev": true
+		},
+		"@types/uuid": {
+			"version": "8.0.0",
+			"resolved": "https://registry.npmjs.org/@types/uuid/-/uuid-8.0.0.tgz",
+			"integrity": "sha512-xSQfNcvOiE5f9dyd4Kzxbof1aTrLobL278pGLKOZI6esGfZ7ts9Ka16CzIN6Y8hFHE1C7jIBZokULhK1bOgjRw==",
+			"dev": true
 		},
 		"abstract-leveldown": {
 			"version": "0.12.4",

@@ -1,23 +1,23 @@
-const fs = require('fs');
-const {
+import fs from 'fs';
+import {
     promisify
-} = require('util');
-const uuid = require('uuid/v4');
-const tempDirectory = require('temp-dir');
-const rimraf = require('rimraf');
+} from 'util';
+import uuid from 'uuid/v4';
+import tempDirectory from 'temp-dir';
+import rimraf from 'rimraf';
 
 const writeFile = promisify(fs.writeFile);
 const unlinkFile = promisify(fs.unlink);
 
-async function WriteToFile(contents, path = '') {
+export async function WriteToFile(contents, path: string = '') {
     return await writeFile(path || `${uuid()}.json`, JSON.stringify(contents));
-}
+};
 
-async function DeleteFile(path) {
+export async function DeleteFile(path: string) {
     return await unlinkFile(path);
-}
+};
 
-function CreateDirectory(callback) {
+export function CreateDirectory(callback: Function) {
     const dirPath = `${tempDirectory}\\${uuid()}`;
     fs.mkdir(dirPath, (err) => {
         if (err) {
@@ -25,20 +25,13 @@ function CreateDirectory(callback) {
         }
         return callback(null, dirPath);
     });
-}
+};
 
-function CleanUpFiles(directory, callback) {
+export function CleanUpFiles(directory: string, callback: Function) {
     rimraf(directory, (err) => {
         if (err) {
             return callback(err);
         }
         return callback();
-    })
-}
-
-module.exports = {
-    WriteToFile,
-    DeleteFile,
-    CreateDirectory,
-    CleanUpFiles
-}
+    });
+};
