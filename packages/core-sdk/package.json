@@ -1,6 +1,6 @@
 {
   "name": "mtg-card-analyzer",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.3-alpha.0",
   "description": "a mtg ocr app for documenting a collection",
   "main": "src/index.js",
   "scripts": {
