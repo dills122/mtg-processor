@@ -1,10 +1,11 @@
 const base64Img = require('image-to-base64');
-const log = require('../logger/log');
 const dependencies = {
     base64Img
 };
-
-const logger = log.create({
+const {
+    default: Logger
+} = require('../logger/log');
+const logger = new Logger({
     isPretty: true
 });
 

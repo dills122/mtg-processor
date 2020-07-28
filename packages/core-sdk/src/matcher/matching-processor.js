@@ -5,7 +5,9 @@ const {
     callbackify
 } = require("util");
 
-const logger = require('../logger/log');
+const {
+    default: Logger
+} = require('../logger/log');
 
 const dependencies = {
     Searcher: callbackify(require("../scryfall-api/index").Search.SearchList),
@@ -27,7 +29,7 @@ class MatcherProcessor {
         }
         _.assign(this, params);
         if (!this.logger) {
-            this.logger = logger.create({
+            this.logger = new Logger({
                 isPretty: false
             });
         }

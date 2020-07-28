@@ -2,7 +2,9 @@ const async = require("async");
 const _ = require('lodash');
 const joi = require("@hapi/joi");
 
-const logger = require('../logger/log');
+const {
+    default: Logger
+} = require('../logger/log');
 const dependencies = {
     resize: require('./resize'),
     textExtraction: require("../image-analysis/index").textExtraction
@@ -19,7 +21,7 @@ class ImageProcessor {
         let validatedSchema = joi.attempt(params, schema);
         _.assign(this, validatedSchema);
         if (!this.logger) {
-            this.logger = logger.create({
+            this.logger = new Logger({
                 isPretty: false
             });
         }

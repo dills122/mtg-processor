@@ -1,6 +1,9 @@
 const _ = require('lodash');
 const async = require("async");
-const logger = require('../logger/log');
+const {
+    default: Logger
+} = require('../logger/log');
+
 const joi = require("@hapi/joi");
 const config = require('./constants');
 
@@ -21,8 +24,8 @@ class ProcessHashes {
         let validatedSchema = joi.attempt(params, schema);
         _.assign(this, validatedSchema);
         if (!this.logger) {
-            this.logger = logger.create({
-                isPretty: false
+            this.logger = new Logger({
+                isPretty: true
             });
         }
     }

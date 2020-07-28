@@ -17,6 +17,14 @@ before_install:
 install:
   - npx lerna bootstrap
 
+script:
+  - npx lerna run build
+  - npx lerna run test
+
+after_script: 
+  - npx lerna run coverage:ts
+  - npx lerna run coverage:js
+
 cache:
   directories:
     - node_modules
