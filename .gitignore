@@ -69,3 +69,5 @@ tsconfig.tsbuildinfo
 
 /packages/**/dist
 /packages/**/types
+
+cdk.out
