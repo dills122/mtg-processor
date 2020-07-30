@@ -1,10 +1,8 @@
-const _ = require('lodash');
-const async = require("async");
-const joi = require("@hapi/joi");
-const FuzzySet = require('fuzzyset.js');
-const {
-    default: Logger
-} = require('../logger/log');
+import _ from 'lodash';
+import async from 'async';
+import joi from '@hapi/joi';
+import FuzzySet from 'fuzzyset.js';
+import Logger from '../logger/log';
 
 const config = {
     highConfidence: .95,
@@ -12,7 +10,7 @@ const config = {
     maxMatches: 5
 };
 
-const dependencies = {
+export const dependencies = {
     GetNames: require('../db-local/index').GetBulkNames
 };
 
@@ -22,13 +20,20 @@ const schema = joi.object().keys({
     logger: joi.object().optional()
 });
 
-class MatchName {
+export function filterNames(names: Array<NameRecords>): Array<string> {
+    return names.map((record) => {
+        return record.name;
+    });
+}
+
+export default class MatchName {
+    logger: Logger;
+    cleanText: string;
+    initialResults: Array<Array<number | string>> | null;
+
     constructor(params) {
-        let isValid = !joi.validate(params, schema).error;
-        if (!isValid) {
-            throw new Error("Required params missing");
-        }
-        _.assign(this, params);
+        let validated = !joi.attempt(params, schema);
+        _.assign(this, validated);
         if (!this.logger) {
             this.logger = new Logger({
                 isPretty: false
@@ -36,18 +41,18 @@ class MatchName {
         }
     }
 
-    filteredNames(names) {
-        return names.map((record) => {
-            return record.name;
+    async Match(): Promise<MatchResults | Array<MatchResults>> {
+        return new Promise((resolve, reject) => {
+            async.waterfall([
+                (next) => this.gatherInitialResults(next),
+                (next) => this.filterBulkMatches(next),
+            ], (err, results) => {
+                if (err) {
+                    return reject(err);
+                }
+                return resolve(results);
+            });
         });
-    }
-
-    Match(callback) {
-        async.waterfall([
-            (next) => this.gatherInitialResults(next),
-            (next) => this.filterBulkMatches(next),
-        ], callback);
-
     }
 
     gatherInitialResults(callback) {
@@ -55,7 +60,7 @@ class MatchName {
             if (err) {
                 return callback(err);
             }
-            let filteredNames = this.filteredNames(names);
+            let filteredNames = filterNames(names);
             let fuzzy = FuzzySet(filteredNames);
             this.initialResults = fuzzy.get(this.cleanText);
             return callback();
@@ -72,7 +77,7 @@ class MatchName {
         });
 
         let highConfidenceMatches = _.filter(fixedResults, (item) => {
-            return item.percentage >= config.highConfidence;
+            return Number(item.percentage) >= config.highConfidence;
         });
 
         if (highConfidenceMatches.length > 1) {
@@ -80,14 +85,16 @@ class MatchName {
         }
 
         return callback(null, _.filter(fixedResults, (item) => {
-            return item.percentage >= config.minConfidence;
+            return Number(item.percentage) >= config.minConfidence;
         }).splice(0, config.maxMatches + 1));
     }
 }
 
-module.exports = {
-    create: function (params) {
-        return new MatchName(params);
-    },
-    dependencies
+export interface NameRecords {
+    name: string;
+};
+
+export interface MatchResults {
+    name: string,
+    percentage: string | number
 };
