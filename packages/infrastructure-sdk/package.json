@@ -35,10 +35,14 @@
   },
   "dependencies": {
     "@aws-cdk/aws-apigateway": "^1.54.0",
+    "@aws-cdk/aws-ec2": "^1.54.0",
+    "@aws-cdk/aws-efs": "^1.54.0",
     "@aws-cdk/aws-lambda": "^1.54.0",
     "@aws-cdk/core": "^1.54.0",
     "aws-cdk": "^1.54.0",
-    "aws-sdk": "^2.721.0"
+    "aws-sdk": "^2.721.0",
+    "eslint": "^7.5.0",
+    "mtg-card-analyzer-sdk": "file:../core-sdk"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.59",

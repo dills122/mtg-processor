@@ -10,7 +10,7 @@
     "coverage:js": "nyc -r lcov -e .js -x \"*.spec.js\" npm run test",
     "compile": "tsc",
     "clean": "tsc --build --clean",
-    "prepare" : "npm run build",
+    "prepare": "npm run build",
     "test": "mocha \"./test/**/*.spec.js\"",
     "test:js": "mocha \"./test/**/*.spec.js\"",
     "test:ts": "mocha -r ts-node/register tests/**/*.spec.ts",
