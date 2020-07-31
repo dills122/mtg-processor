@@ -2,7 +2,7 @@ import sinon from 'sinon';
 import NameMatch, { dependencies } from '../../src/fuzzy-matching/match-name';
 import { expect, assert } from 'chai';
 
-import mock from '../../mocks/bulkCardNames'
+import mock from '../../mocks/bulkCardNames';
 
 describe('FuzzyMatching::', () => {
     let sandbox: sinon.SinonSandbox;

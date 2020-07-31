@@ -4,7 +4,7 @@ const {
 } = require('./db-local/index');
 const {
     Search
-} = require('./scryfall-api/index');
+} = require('./scryfall-api/index').default;
 const {
     Hash
 } = require('./image-hashing/index');

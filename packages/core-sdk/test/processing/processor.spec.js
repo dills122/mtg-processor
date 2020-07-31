@@ -11,7 +11,7 @@ const MatchProcessor = require("../../src/matcher").MatchingProcessor;
 const NeedsAttention = require("../../src/models/needs-attention");
 const Collection = require("../../src/models/card-collection");
 const RDSCollection = require("../../src/rds").Collection;
-const GetAdditionalCardInfo = require("../../src/scryfall-api").Search;
+const GetAdditionalCardInfo = require("../../src/scryfall-api").default.Search;
 
 const EXTRACTED_TEXT = "Pacifism s";
 const DIR = "./tmp/dir";

@@ -1,9 +1,7 @@
-const chai = require('chai');
-const sinon = require('sinon');
-const assert = require('chai').assert;
-const api = require('../../src/scryfall-api/searchName');
-const cardNames = require('../../src/scryfall-api/getCardName');
-const deps = api.dependencies;
+import sinon from 'sinon';
+import { expect, assert } from 'chai';
+import api from '../../src/scryfall-api/';
+const { GetCardNames, Search } = api;
 
 describe('Srcyfall Api::', () => {
     describe('::searchName::', () => {
@@ -14,47 +12,38 @@ describe('Srcyfall Api::', () => {
             "next_page": "https://api.scryfall.com/cards/search?format=json&include_extras=false&include_multilingual=false&order=cmc&page=2&q=c%3Ared+pow%3D3&unique=cards",
             "data": [{}]
         };
-        let stubs = {};
+        let stubs: any = {};
         let sandbox = sinon.createSandbox();
         beforeEach(() => {
-            stubs.requestStub = sandbox.stub(deps, 'request').resolves(JSON.stringify(json));
+            stubs.requestStub = sandbox.stub(Search.dependencies, 'request').resolves(JSON.stringify(json));
         });
         afterEach(() => {
             sandbox.restore();
         });
         it('SearchByNameExact', (done) => {
-            api.SearchByNameExact('Fake Name').then((card) => {
+            Search.SearchByNameExact('Fake Name').then((card) => {
                 assert.isTrue(stubs.requestStub.calledOnce);
-                assert.strictEqual(card.object, "list");
-                assert.deepStrictEqual(card, json);
-                done();
+                assert(card);
+                expect(card).to.be.an('array').and.length(1);
+                return done();
             }).catch((err) => {
-                done(err);
+                return done(err);
             });
-            
-        });
-        it('SearchByNameFuzzy', (done) => {
-            api.SearchByNameFuzzy('Fake Name', 'Fake % Name').then((card) => {
-                assert.isTrue(stubs.requestStub.calledOnce);
-                assert.strictEqual(card.object, "list");
-                assert.deepStrictEqual(card, json);
-                done();
-            }).catch((err) => {
-                done(err);
-            });
-            
+
         });
         it('SearchList', (done) => {
-            api.SearchList('Fake Name').then((cards) => {
-                let card = cards[0];
+            Search.SearchList('Fake Name').then((cards) => {
                 assert.isTrue(stubs.requestStub.calledOnce);
-                assert.strictEqual(cards.length, 1);
-                assert.deepStrictEqual(card, {});
-                assert.deepStrictEqual(cards, json.data);
+                assert(cards);
+                expect(cards).to.be.an('array').and.length(1);
+                const card = cards[0];
+                expect(card).to.be.an('object');
+                assert.deepEqual(card, {});
+                return done();
                 done();
             }).catch((err) => {
                 done(err);
-            });   
+            });
         });
     });
     describe('::getCardName::', () => {
@@ -63,18 +52,18 @@ describe('Srcyfall Api::', () => {
             "total_cards": 445,
             "has_more": true,
             "next_page": "https://api.scryfall.com/cards/search?format=json&include_extras=false&include_multilingual=false&order=cmc&page=2&q=c%3Ared+pow%3D3&unique=cards",
-            "data": ['Card','CardTwo']
+            "data": ['Card', 'CardTwo']
         };
-        let stubs = {};
+        let stubs : any = {};
         let sandbox = sinon.createSandbox();
         beforeEach(() => {
-            stubs.requestStub = sandbox.stub(cardNames.dependencies, 'request').resolves(JSON.stringify(json));
+            stubs.requestStub = sandbox.stub(GetCardNames.dependencies, 'request').resolves(JSON.stringify(json));
         });
         afterEach(() => {
             sandbox.restore();
         });
         it('SearchByNameExact', (done) => {
-            cardNames.GetCardNames().then((names) => {
+            GetCardNames.GetCardNames().then((names) => {
                 assert.isTrue(stubs.requestStub.calledOnce);
                 assert.strictEqual(names[0], json.data[0]);
                 assert.strictEqual(names[1], json.data[1]);
@@ -82,7 +71,7 @@ describe('Srcyfall Api::', () => {
                 done();
             }).catch((err) => {
                 done(err);
-            });         
+            });
         });
     });
 });

@@ -16,7 +16,7 @@ const dependencies = {
     NeedsAttention: require("../models/needs-attention"),
     Collection: require("../models/card-collection"),
     RDSCollection: require("../rds").Collection,
-    GetAdditionalCardInfo: require("../scryfall-api").Search,
+    GetAdditionalCardInfo: require("../scryfall-api").default.Search,
     Base64: callbackify(require("image-to-base64"))
 };
 

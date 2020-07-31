@@ -5,7 +5,7 @@ import { expect, assert } from 'chai';
 
 
 describe('FuzzyMatching::', () => {
-    describe.only('TypeMatching::', () => {
+    describe('TypeMatching::', () => {
         let sandbox: sinon.SinonSandbox;
 
         beforeEach(() => {
