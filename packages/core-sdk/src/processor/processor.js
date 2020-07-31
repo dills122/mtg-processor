@@ -11,12 +11,12 @@ const {
 const dependencies = {
     ImageProcessor: require("../image-processing").ImageProcessor,
     FileIO: require("../file-io"),
-    MatchName: require("../fuzzy-matching/index").MatchName,
+    MatchName: require("../fuzzy-matching/index").default.MatchName,
     MatchProcessor: require("../matcher").MatchingProcessor,
     NeedsAttention: require("../models/needs-attention"),
     Collection: require("../models/card-collection"),
     RDSCollection: require("../rds").Collection,
-    GetAdditionalCardInfo: require("../scryfall-api").Search,
+    GetAdditionalCardInfo: require("../scryfall-api").default.Search,
     Base64: callbackify(require("image-to-base64"))
 };
 
@@ -77,16 +77,17 @@ class Processor {
 
     processExtractionResults(callback) {
         this.logger.info("Matching Name");
-        dependencies.MatchName.create({
+        const MatchName = dependencies.MatchName;
+        const matcher = new MatchName({
             cleanText: this.nameExtractionResults.cleanText,
             dirtyText: this.nameExtractionResults.dirtyText
-        }).Match((err, matchResults) => {
-            if (err) {
-                return callback(err);
-            }
+        })
+        matcher.Match().then((matchResults) => {
             this.nameMatches = matchResults;
             this.logger.info(`Matches returned ${this.nameMatches}`);
             return callback();
+        }).catch((err) => {
+            return callback(err);
         });
     }
 
@@ -156,7 +157,7 @@ class Processor {
         let set = record.sets[0];
         async.parallel([
             async.apply(dependencies.RDSCollection.GetQuantity, record.name, set),
-                async.apply(dependencies.GetAdditionalCardInfo.SearchByNameExact, record.name, '')
+            async.apply(dependencies.GetAdditionalCardInfo.SearchByNameExact, record.name, '')
         ], (err, results) => {
             if (err) {
                 this.logger.error(err);

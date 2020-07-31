@@ -10,7 +10,7 @@ const {
 } = require('../logger/log');
 
 const dependencies = {
-    Searcher: callbackify(require("../scryfall-api/index").Search.SearchList),
+    Searcher: callbackify(require("../scryfall-api/index").default.Search.SearchList),
     HashProcessor: require("../export-processor/").ProcessHashes,
     Hash: require("../image-hashing/").Hash.HashImage
 };

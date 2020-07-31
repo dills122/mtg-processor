@@ -3,7 +3,7 @@ const {
 } = require('./db');
 const {
     GetCardNames
-} = require('../scryfall-api/index');
+} = require('../scryfall-api/index').default;
 
 async function ExecuteBulkInsert() {
     let names = await GetCardNames();
