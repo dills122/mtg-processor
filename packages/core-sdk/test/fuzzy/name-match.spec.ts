@@ -1,12 +1,11 @@
 import sinon from 'sinon';
 import NameMatch, { dependencies } from '../../src/fuzzy-matching/match-name';
-import Sinon from 'sinon';
 import { expect, assert } from 'chai';
 
 import mock from '../../mocks/bulkCardNames'
 
 describe('FuzzyMatching::', () => {
-    let sandbox: Sinon.SinonSandbox;
+    let sandbox: sinon.SinonSandbox;
     let bulkNamesStub: sinon.SinonStub;
 
     beforeEach(() => {

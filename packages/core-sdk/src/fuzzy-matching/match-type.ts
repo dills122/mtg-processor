@@ -1,16 +1,21 @@
 import _ from 'lodash';
 import FuzzySet from 'fuzzyset.js';
+import { remapFuzzyResults } from './util';
 import Logger from '../logger/log';
 const Types = {
     creature: require('../data/creatureTypes'),
     card: require('../data/cardTypes')
 };
 
+export const dependencies = {
+    Types
+};
+
 //TODO Move this out after dev done
 const MatchConstants = {
-    baseMatchPercentage: 50,
-    betterMatchPercentage: 65,
-    bestMatchPercentage: 75
+    baseMatchPercentage: .50,
+    betterMatchPercentage: .65,
+    bestMatchPercentage: .75
 };
 
 export default class MatchType {
@@ -23,6 +28,7 @@ export default class MatchType {
                 isPretty: false
             });
         }
+        this.matches = [];
     };
 
     match(inputStr: string): { name: string, matchPercentage: number } | {} {
@@ -33,81 +39,81 @@ export default class MatchType {
             this.matchString = inputStr;
             this.executeMatchers(inputStr);
             const filteredResults = this.filterResults();
-            if (Object.keys(filteredResults).length > 0) {
-                return filteredResults;
-            }
-            if (_.isArray(filteredResults) && filteredResults.length > 0) {
+            if (filteredResults.length > 0) {
                 const first = _.first(filteredResults);
                 return {
                     name: first?.name,
                     matchPercentage: first?.percentage
                 }
             }
-            return filteredResults;
+            return {};
         } catch (err) {
+            console.log(err);
             return {};
         }
     }
 
     executeMatchers(matchStr: string) {
-        Object.keys(Types).forEach((key, _index, array) => {
-            const fuzzy = FuzzySet(array[key]);
-            const fullNameResults = {
-                str: matchStr,
-                results: fuzzy.get(matchStr)
-            };
-
-            const partialNameMatches = _.map(matchStr.split(' '), (partialStr) => {
-                return {
-                    str: partialStr,
-                    results: fuzzy.get(partialStr)
-                }
-            }).values();
-
-            this.matches.concat([fullNameResults, ...partialNameMatches].map((match) => {
-                const remappedMatches = match.results?.map((idvMatch) => {
-                    const [percentage, name] = idvMatch;
-                    return {
-                        percentage,
-                        name
-                    };
-                })
-                return {
-                    str: match.str,
-                    results: remappedMatches
-                }
-            }));
-        });
+        for (const key of Object.keys(dependencies.Types)) {
+            const fuzzy = FuzzySet(dependencies.Types[key]);
+            const results = remapFuzzyResults(fuzzy.get(matchStr));
+            if (results.length > 0) {
+                this.matches.push({
+                    str: matchStr,
+                    results
+                });
+            }
+            const partialNames = matchStr.split(' ');
+            if (partialNames.length > 1) {
+                const partialNameMatches = this.runPartialNameMatchers(partialNames, fuzzy);
+                this.matches.push(...partialNameMatches);
+            }
+        }
         return this.matches;
     }
 
-    filterResults(): Array<{ str: string, name: string, percentage: string | number }> | Error {
-        if (_.isEmpty(this.matches)) {
-            return new Error('No results to filter');
-        }
-        this.matches.map((match) => {
-            let filteredInnerResults: { percentage: number; name: string; }[] = [];
-            const { results } = match;
-            filteredInnerResults = this.runAganistMatchThresholds(results);
-            const { name, percentage } = _.chain(filteredInnerResults).sortBy(['percentage']).first().value();
+    runPartialNameMatchers(partialNames: string[], fuzzy: FuzzySet) {
+        return partialNames.map((partialStr) => {
+            const partialFuzzyResults = remapFuzzyResults(fuzzy.get(partialStr));
             return {
-                str: match.str,
-                name,
-                percentage
-            };
+                str: partialStr,
+                results: partialFuzzyResults
+            }
         });
-        return this.runAganistMatchThresholds(this.matches);
     }
 
-    runAganistMatchThresholds(results) {
-        let filteredInnerResults: any[] = [];
-        Reflect.ownKeys(MatchConstants).some((key, _index, array) => {
-            const threshold = array[key];
+    filterResults(): Array<{ name: string, percentage: number }> {
+        const arry: Array<{ str: string, name: string, percentage: number }> = [];
+        if (!this.matches || _.isEmpty(this.matches)) {
+            throw new Error('No results to filter');
+        }
+        for (let i = 0; i < this.matches.length; i++) {
+            const { results, str } = this.matches[i];
+            if (!results) {
+                continue;
+            }
+            const filteredInnerResults = this.runAganistMatchThresholds(results);
+            if (filteredInnerResults.length > 0) {
+                const { name, percentage } = _.chain(filteredInnerResults).orderBy(['percentage']).first().value();
+                arry.push({
+                    str,
+                    name,
+                    percentage
+                });
+            }
+        }
+        return _.orderBy(this.runAganistMatchThresholds(arry), ['percentage'], ['desc']);
+    }
+
+    runAganistMatchThresholds(results: Array<{ name: string, percentage: number }>): Array<{ name: string, percentage: number }> {
+        let filteredInnerResults: Array<{ name: string, percentage: number }> = [];
+        Reflect.ownKeys(MatchConstants).some((key) => {
+            const threshold = MatchConstants[key];
             const filteredMatchResults = _.filter(results, (obj) => {
                 return threshold <= obj.percentage;
             });
-            if (!_.isEmpty(filteredMatchResults)) {
-                filteredInnerResults.concat(filteredMatchResults);
+            if (filteredMatchResults.length > 0) {
+                filteredInnerResults.push(...filteredMatchResults);
                 return true;
             }
             return false;
