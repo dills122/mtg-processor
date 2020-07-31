@@ -35,7 +35,7 @@ export default class MatchName {
     finalResults: { name: string | number; percentage: string | number; }[];
 
     constructor(params) {
-        let validated = !joi.attempt(params, schema);
+        let validated = joi.attempt(params, schema);
         _.assign(this, validated);
         if (!this.logger) {
             this.logger = new Logger({
@@ -66,7 +66,7 @@ export default class MatchName {
                 return callback(err);
             }
             let filteredNames = filterNames(names);
-            if(!filterNames || _.isEmpty(filterNames)) {
+            if(!filterNames || _.isEmpty(filteredNames)) {
                 return callback(new Error('No Names found to add to fuzzy set'));
             }
             let fuzzy = FuzzySet(filteredNames);
