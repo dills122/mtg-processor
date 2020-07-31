@@ -3,6 +3,7 @@ import async from 'async';
 import joi from '@hapi/joi';
 import FuzzySet from 'fuzzyset.js';
 import Logger from '../logger/log';
+const GetBulkNames = require('../db-local/index').GetBulkNames;
 
 const config = {
     highConfidence: .95,
@@ -11,7 +12,7 @@ const config = {
 };
 
 export const dependencies = {
-    GetNames: require('../db-local/index').GetBulkNames
+    GetNames: GetBulkNames
 };
 
 const schema = joi.object().keys({
@@ -29,7 +30,9 @@ export function filterNames(names: Array<NameRecords>): Array<string> {
 export default class MatchName {
     logger: Logger;
     cleanText: string;
+    dirtyText: string;
     initialResults: Array<Array<number | string>> | null;
+    finalResults: { name: string | number; percentage: string | number; }[];
 
     constructor(params) {
         let validated = !joi.attempt(params, schema);
@@ -46,11 +49,13 @@ export default class MatchName {
             async.waterfall([
                 (next) => this.gatherInitialResults(next),
                 (next) => this.filterBulkMatches(next),
-            ], (err, results) => {
+            ], (err) => {
                 if (err) {
                     return reject(err);
                 }
-                return resolve(results);
+                if(this.finalResults) {
+                    return resolve(this.finalResults);
+                }
             });
         });
     }
@@ -61,13 +66,16 @@ export default class MatchName {
                 return callback(err);
             }
             let filteredNames = filterNames(names);
+            if(!filterNames || _.isEmpty(filterNames)) {
+                return callback(new Error('No Names found to add to fuzzy set'));
+            }
             let fuzzy = FuzzySet(filteredNames);
             this.initialResults = fuzzy.get(this.cleanText);
             return callback();
         });
     }
 
-    filterBulkMatches(callback) {
+    filterBulkMatches(callback): void {
         let fixedResults = _.map(this.initialResults, (match) => {
             let [namePercent, nameMatch] = match;
             return {
@@ -83,10 +91,10 @@ export default class MatchName {
         if (highConfidenceMatches.length > 1) {
             return callback(null, highConfidenceMatches.splice(0, config.maxMatches + 1));
         }
-
-        return callback(null, _.filter(fixedResults, (item) => {
+        this.finalResults = _.filter(fixedResults, (item) => {
             return Number(item.percentage) >= config.minConfidence;
-        }).splice(0, config.maxMatches + 1));
+        }).splice(0, config.maxMatches + 1);
+        return callback(null, this.finalResults);
     }
 }
 
@@ -95,6 +103,6 @@ export interface NameRecords {
 };
 
 export interface MatchResults {
-    name: string,
+    name: string | number,
     percentage: string | number
 };

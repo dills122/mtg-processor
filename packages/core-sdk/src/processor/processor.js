@@ -77,16 +77,17 @@ class Processor {
 
     processExtractionResults(callback) {
         this.logger.info("Matching Name");
-        dependencies.MatchName.create({
+        const { default: MatchName } = dependencies.MatchName;
+        const matcher = new MatchName({
             cleanText: this.nameExtractionResults.cleanText,
             dirtyText: this.nameExtractionResults.dirtyText
-        }).Match((err, matchResults) => {
-            if (err) {
-                return callback(err);
-            }
+        })
+        matcher.Match().then((matchResults) => {
             this.nameMatches = matchResults;
             this.logger.info(`Matches returned ${this.nameMatches}`);
             return callback();
+        }).catch((err) => {
+            return callback(err);
         });
     }
 
@@ -156,7 +157,7 @@ class Processor {
         let set = record.sets[0];
         async.parallel([
             async.apply(dependencies.RDSCollection.GetQuantity, record.name, set),
-                async.apply(dependencies.GetAdditionalCardInfo.SearchByNameExact, record.name, '')
+            async.apply(dependencies.GetAdditionalCardInfo.SearchByNameExact, record.name, '')
         ], (err, results) => {
             if (err) {
                 this.logger.error(err);

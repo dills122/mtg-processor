@@ -6,7 +6,7 @@ const sinon = require("sinon");
 const Processor = require("../../src/processor").Processor;
 const ImageProcessor = require("../../src/image-processing").ImageProcessor;
 const FileIO = require("../../src/file-io");
-const MatchName = require("../../src/fuzzy-matching").MatchName;
+const { default: MatchName } = require("../../src/fuzzy-matching").MatchName;
 const MatchProcessor = require("../../src/matcher").MatchingProcessor;
 const NeedsAttention = require("../../src/models/needs-attention");
 const Collection = require("../../src/models/card-collection");
@@ -25,7 +25,6 @@ describe("Integration::", () => {
     let stubs = {};
     let spies = {};
     let ImageProcessorInstance = {};
-    let MatchNameInstance = {};
     let MatchProcessorInstance = {};
 
     beforeEach(() => {
@@ -36,9 +35,7 @@ describe("Integration::", () => {
             dirtyText: EXTRACTED_TEXT
         });
         stubs.CreateDirectoryStub = sandbox.stub(FileIO, "CreateDirectory").callsArgWith(0, null, DIR);
-        stubs.MatchNameCreateStub = sandbox.stub(MatchName, "create").returns(MatchNameInstance);
-        MatchNameInstance.Match = new Function();
-        stubs.MatchNameMatchStub = sandbox.stub(MatchNameInstance, "Match").callsArgWith(0, null, [{
+        stubs.MatchNameMatchStub = sandbox.stub(MatchName.prototype, "Match").resolves([{
             name: "Pacifism",
             percentage: 100
         }]);
@@ -163,7 +160,6 @@ describe("Integration::", () => {
                 assert.isTrue(stubs.ImageProcessorExtractStub.calledOnce);
                 assert.isTrue(stubs.CreateDirectoryStub.calledOnce);
                 assert.deepEqual(processorInstance.directory, DIR);
-                assert.isTrue(stubs.MatchNameCreateStub.calledOnce);
                 assert.isTrue(stubs.MatchNameMatchStub.calledOnce);
                 assert.isTrue(stubs.MatchProcessorCreateStub.calledOnce);
                 assert.isTrue(stubs.MatchProcessorExecuteStub.calledOnce);
@@ -177,7 +173,7 @@ describe("Integration::", () => {
         it("Should execute happy path for needs attention record", (done) => {
             stubs.MatchNameMatchStub.restore();
             stubs.MatchProcessorExecuteStub.restore();
-            stubs.MatchNameMatchStub = sandbox.stub(MatchNameInstance, "Match").callsArgWith(0, null, [{
+            stubs.MatchNameMatchStub = sandbox.stub(MatchName.prototype, "Match").resolves([{
                 name: "Pacifism",
                 percentage: 90.2
             }, {
@@ -186,9 +182,9 @@ describe("Integration::", () => {
             }, {
                 name: "Another Fake",
                 percentage: 90
-            }]); 
+            }]);
             stubs.MatchProcessorExecuteStub = sandbox.stub(MatchProcessorInstance, "execute").callsArgWith(0, null, [COLLECTION_NAME, COLLECTION_NAME_TWO]); //Empty right now and will have to be a multi call oen since in async.each
-            
+
             let processorInstance = Processor.create({
                 filePath: FAKE_PATH
             });
@@ -197,7 +193,6 @@ describe("Integration::", () => {
                 assert.deepEqual(processorInstance.directory, DIR);
                 assert.isTrue(stubs.ImageProcessorCreateStub.calledOnce);
                 assert.isTrue(stubs.ImageProcessorExtractStub.calledOnce);
-                assert.isTrue(stubs.MatchNameCreateStub.calledOnce);
                 assert.isTrue(stubs.MatchNameMatchStub.calledOnce);
                 assert.isTrue(stubs.MatchProcessorCreateStub.callCount === 3);
                 assert.isTrue(stubs.MatchProcessorExecuteStub.callCount === 3);
@@ -209,7 +204,7 @@ describe("Integration::", () => {
 
         it("Should error out if no fuzzy match results are returned", (done) => {
             stubs.MatchNameMatchStub.restore();
-            stubs.MatchNameMatchStub = sandbox.stub(MatchNameInstance, "Match").callsArgWith(0, null, []);
+            stubs.MatchNameMatchStub = sandbox.stub(MatchName.prototype, "Match").resolves([]);
             let processorInstance = Processor.create({
                 filePath: FAKE_PATH
             });
@@ -218,7 +213,6 @@ describe("Integration::", () => {
                 assert.deepEqual(processorInstance.directory, DIR);
                 assert.isTrue(stubs.ImageProcessorCreateStub.calledOnce);
                 assert.isTrue(stubs.ImageProcessorExtractStub.calledOnce);
-                assert.isTrue(stubs.MatchNameCreateStub.calledOnce);
                 assert.isTrue(stubs.MatchNameMatchStub.calledOnce);
                 assert.isTrue(err instanceof Error);
                 assert.isFalse(stubs.MatchProcessorCreateStub.calledOnce);
