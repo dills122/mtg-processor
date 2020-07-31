@@ -1,5 +1,5 @@
 {
-  "name": "mtg-card-analyzer",
+  "name": "mtg-card-analyzer-sdk",
   "version": "0.0.3-alpha.0",
   "description": "a mtg ocr app for documenting a collection",
   "main": "src/index.js",
@@ -10,10 +10,15 @@
     "coverage:js": "nyc -r lcov -e .js -x \"*.spec.js\" npm run test",
     "compile": "tsc",
     "clean": "tsc --build --clean",
+    "prepare" : "npm run build",
     "test": "mocha \"./test/**/*.spec.js\"",
     "test:js": "mocha \"./test/**/*.spec.js\"",
     "test:ts": "mocha -r ts-node/register tests/**/*.spec.ts",
     "watch": "tsc -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dills122/mtg-processor.git"
   },
   "keywords": [
     "mtg",
