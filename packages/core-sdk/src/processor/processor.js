@@ -11,7 +11,7 @@ const {
 const dependencies = {
     ImageProcessor: require("../image-processing").ImageProcessor,
     FileIO: require("../file-io"),
-    MatchName: require("../fuzzy-matching/index").MatchName,
+    MatchName: require("../fuzzy-matching/index").default.MatchName,
     MatchProcessor: require("../matcher").MatchingProcessor,
     NeedsAttention: require("../models/needs-attention"),
     Collection: require("../models/card-collection"),
@@ -77,7 +77,7 @@ class Processor {
 
     processExtractionResults(callback) {
         this.logger.info("Matching Name");
-        const { default: MatchName } = dependencies.MatchName;
+        const MatchName = dependencies.MatchName;
         const matcher = new MatchName({
             cleanText: this.nameExtractionResults.cleanText,
             dirtyText: this.nameExtractionResults.dirtyText

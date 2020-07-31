@@ -2,20 +2,15 @@ import _ from 'lodash';
 import FuzzySet from 'fuzzyset.js';
 import { remapFuzzyResults } from './util';
 import Logger from '../logger/log';
+import config from '../config';
 const Types = {
     creature: require('../data/creatureTypes'),
     card: require('../data/cardTypes')
 };
+const MatchConstants = config.fuzzyMatching.matchConstants;
 
 export const dependencies = {
     Types
-};
-
-//TODO Move this out after dev done
-const MatchConstants = {
-    baseMatchPercentage: .50,
-    betterMatchPercentage: .65,
-    bestMatchPercentage: .75
 };
 
 export default class MatchType {
