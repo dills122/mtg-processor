@@ -9,7 +9,7 @@ const config = require('./constants');
 
 const dependencies = {
     CardHashes: require("../rds").CardHashes,
-    Hash: require("../image-hashing").Hash
+    Hash: require("../image-hashing").default.Hash
 };
 
 const schema = joi.object().keys({
@@ -38,7 +38,7 @@ class ProcessHashes {
             }
             let matches = [];
             hashes.forEach((dbHash) => {
-                let compareResults = dependencies.Hash.CompareHash(this.localHash, dbHash.cardHash);
+                let compareResults = dependencies.Hash.compareHash(this.localHash, dbHash.cardHash);
                 let isMatch = compareResults.twoBitMatches >= .92 &&
                     compareResults.fourBitMatches >= .88 &&
                     compareResults.stringCompare >= .92;
@@ -71,18 +71,19 @@ class ProcessHashes {
         let comparisonResultsList = [];
         async.each(cards, (card, cb) => {
             const { url, setName } = card;
-            dependencies.Hash.HashImage(url, (err, remoteImageHash) => {
-                if (err) {
-                    return cb(err);
-                }
+            dependencies.Hash.hashImage(url).then((remoteImageHash) => {
                 this._insertCardHash(remoteImageHash, setName);
-                let comparisonResults = dependencies.Hash.CompareHash(this.localHash, remoteImageHash);
+                let comparisonResults = dependencies.Hash.compareHash(this.localHash, remoteImageHash);
                 if (!_.isEmpty(comparisonResults)) {
                     comparisonResultsList.push(Object.assign(comparisonResults, {
                         setName
                     }));
                 }
                 return cb();
+            }).catch((err) => {
+                if (err) {
+                    return cb(err);
+                }
             });
         }, (err) => {
             if (err) {

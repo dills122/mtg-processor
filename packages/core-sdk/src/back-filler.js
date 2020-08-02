@@ -7,7 +7,7 @@ const {
 } = require('./scryfall-api/index').default;
 const {
     Hash
-} = require('./image-hashing/index');
+} = require('./image-hashing/index').default;
 const {
     CardHashes
 } = require('./rds/index');
@@ -16,7 +16,6 @@ const {
 } = require('util');
 
 let GetNames = promisify(GetBulkNames);
-let HashImage = promisify(Hash.HashImage);
 
 async function BackFillImageHashes() {
     let start = 18501;
@@ -40,7 +39,7 @@ async function BackFillImageHashes() {
             let ext = urlNonQueryStr.split('.').pop() || '';
             if (ext === 'jpg') {
                 try {
-                    let imageHash = await HashImage(card.imgUrl);
+                    let imageHash = await Hash.hashImage(card.imgUrl);
                     CardHashes.InsertEntity({
                         CardName: name,
                         SetName: card.setName,

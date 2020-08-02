@@ -1,5 +1,6 @@
-const Hashing = require('../../src/image-hashing/hash-image');
-const chai = require('chai');
+const Hashing = require('../../src/image-hashing/hash-image').default;
+const imageHash = require('image-hash');
+const { assert } = require('chai');
 const sinon = require('sinon');
 
 describe('Hashing::', () => {
@@ -9,28 +10,31 @@ describe('Hashing::', () => {
     describe('ImageHashing::', () => {
         beforeEach(() => {
             sandbox = sinon.createSandbox();
-            stubs.imageHashStub = sinon.stub(Hashing.dependencies, 'imageHash').callsArgWith(3, null, fakeHash);
+            stubs.imageHashStub = sinon.stub(imageHash, 'imageHash').callsArgWith(3, null, fakeHash);
         });
         afterEach(() => {
             sinon.restore();
         });
         it('Should return a hash of the image', (done) => {
-            Hashing.HashImage(url, (error, hash) => {
-                chai.assert.isNull(error);
-                chai.assert.isString(hash);
-                chai.assert.isTrue(stubs.imageHashStub.calledOnce, "Image Hash called");
+            Hashing.hashImage(url).then((hash) => {
+                assert.isString(hash);
+                assert.isTrue(stubs.imageHashStub.calledOnce, "Image Hash called");
                 done();
+            }).catch((err) => {
+                return done(err);
             });
         });
 
         it('Should return an error', (done) => {
             stubs.imageHashStub.restore();
-            stubs.imageHashStub = sinon.stub(Hashing.dependencies, 'imageHash').callsArgWith(3, {}, null);
-            Hashing.HashImage('', (error, hash) => {
-                chai.assert.deepEqual(error, {});
-                chai.assert.isUndefined(hash);
-                chai.assert.isTrue(stubs.imageHashStub.calledOnce, "Image Hash called");
+            stubs.imageHashStub = sinon.stub(imageHash, 'imageHash').callsArgWith(3, {}, null);
+            Hashing.hashImage('').then((hash) => {
+                assert.deepEqual(error, {});
+                assert.isUndefined(hash);
+                assert.isTrue(stubs.imageHashStub.calledOnce, "Image Hash called");
                 done();
+            }).catch((err) => {
+                return done(err);
             });
         });
     });
@@ -38,11 +42,11 @@ describe('Hashing::', () => {
         const hashOne = '0773063f063f36070e070a070f378e7f1f000fff0fff020103f00ffb0f810ff0';
         const hashTwo = '0773063f063f36070e070a070f378e7f1f000fff0fff020103f00ffb0f810ff0';
         it('Should return a hash comparison result', (done) => {
-            let hashComparisonResults = Hashing.CompareHash(hashOne, hashTwo);
-            chai.assert.isObject(hashComparisonResults);
-            chai.assert.equal(hashComparisonResults.twoBitMatches, 1);
-            chai.assert.equal(hashComparisonResults.fourBitMatches, 1);
-            chai.assert.equal(hashComparisonResults.stringCompare, 1);
+            let hashComparisonResults = Hashing.compareHash(hashOne, hashTwo);
+            assert.isObject(hashComparisonResults);
+            assert.equal(hashComparisonResults.twoBitMatches, 1);
+            assert.equal(hashComparisonResults.fourBitMatches, 1);
+            assert.equal(hashComparisonResults.stringCompare, 1);
             done();
         });
     });

@@ -12,7 +12,7 @@ const {
 const dependencies = {
     Searcher: callbackify(require("../scryfall-api/index").default.Search.SearchList),
     HashProcessor: require("../export-processor/").ProcessHashes,
-    Hash: require("../image-hashing/").Hash.HashImage
+    Hash: require("../image-hashing/").default.Hash.hashImage
 };
 
 const schema = joi.object().keys({
@@ -79,12 +79,13 @@ class MatcherProcessor {
 
     _hashLocalCard(callback) {
         this.logger.info(`Hashing local image ${this.filePath}`)
-        dependencies.Hash(this.filePath, (err, hash) => {
+        dependencies.Hash(this.filePath).then((hash) => {
+            this.localHash = hash;
+            return callback();
+        }).catch((err) => {
             if (err) {
                 return callback(err);
             }
-            this.localHash = hash;
-            return callback();
         });
     }
 
