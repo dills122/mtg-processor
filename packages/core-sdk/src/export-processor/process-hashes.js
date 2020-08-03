@@ -5,7 +5,7 @@ const {
 } = require('../logger/log');
 
 const joi = require("@hapi/joi");
-const config = require('./constants');
+const config = require('../config').default;
 
 const dependencies = {
     CardHashes: require("../rds").CardHashes,
@@ -89,7 +89,7 @@ class ProcessHashes {
             if (err) {
                 return callback(err);
             }
-            let matchValues = config.remoteMatch;
+            let matchValues = config.matchConstants.remote;
             let bestMatches = _.filter(comparisonResultsList, function (match) {
                 return match.twoBitMatches >= matchValues.twoBit &&
                     match.fourBitMatches >= matchValues.fourBit &&
