@@ -3,7 +3,7 @@ import { imageHash } from 'image-hash';
 import { Buffer } from 'buffer';
 import stringSimilarity from 'string-similarity';
 import Logger from '../logger/log';
-const dependencies = {
+export const dependencies = {
     imageHash
 };
 const logger = new Logger({
@@ -12,7 +12,8 @@ const logger = new Logger({
 
 export default {
     hashImage,
-    compareHash
+    compareHash,
+    dependencies
 };
 
 /**
@@ -39,6 +40,9 @@ export async function hashImage(input: string | Buffer): Promise<string> {
  * @param {string} hashTwo - hash two to compare
  */
 export function compareHash(hashOne: string, hashTwo: string) {
+    if(hashOne.length !==  hashTwo.length) {
+        throw new Error('Strings need to be same length for this type of comparison');
+    }
     logger.info(`hash-image::CompareHash:: Comparing Hashes ${hashOne} ${hashTwo}`);
     let HashLength = hashOne.length;
     let twoBitMatches = 0;

@@ -40,7 +40,6 @@ describe('Srcyfall Api::', () => {
                 expect(card).to.be.an('object');
                 assert.deepEqual(card, {});
                 return done();
-                done();
             }).catch((err) => {
                 done(err);
             });
