@@ -5,7 +5,7 @@ const {
 const sinon = require("sinon");
 const ImageProcessor = require("../../src/image-processing").ImageProcessor;
 const resize = require("../../src/image-processing/").resize;
-const textExtraction = require("../../src/image-analysis/").textExtraction;
+const textExtraction = require("../../src/image-analysis/").default.textExtraction;
 
 const FAKE_PATH = "./to/fake.img";
 const FAKE_PATH_INPUT = "/input/to/fake.img";
@@ -23,7 +23,7 @@ describe("Integration::", () => {
 
         beforeEach(() => {
             stubs.resizeStub = sandbox.stub(resize, "GetImageSnippetTmpFile").resolves(FAKE_PATH);
-            stubs.textExtractionStub = sandbox.stub(textExtraction, "ScanImage").callsArgWith(1, null, FAKE_EXTRACTION);
+            stubs.textExtractionStub = sandbox.stub(textExtraction, "ScanImage").resolves(FAKE_EXTRACTION);
         });
 
         afterEach(() => {

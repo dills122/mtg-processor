@@ -7,7 +7,7 @@ const {
 } = require('../logger/log');
 const dependencies = {
     resize: require('./resize'),
-    textExtraction: require("../image-analysis/index").textExtraction
+    textExtraction: require("../image-analysis").default.textExtraction
 };
 const schema = joi.object().keys({
     path: joi.string().required(),
@@ -44,12 +44,11 @@ class ImageProcessor {
     }
 
     extractText(callback) {
-        dependencies.textExtraction.ScanImage(this.imagePath, (err, extractResults) => {
-            if (err) {
-                return callback(err);
-            }
+        dependencies.textExtraction.ScanImage(this.imagePath).then((extractResults) => {
             this.results = extractResults;
             return callback(null, this.results);
+        }).catch((err) => {
+            return callback(err);
         });
     }
 }
