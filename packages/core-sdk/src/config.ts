@@ -16,5 +16,17 @@ export default {
                 cardListExact: 'https://api.scryfall.com/cards/search?q=name%3A'
             }
         }
+    },
+    matchConstants: {
+        remote: {
+            twoBit: .75,
+            fourBit: .70,
+            stringCompare: .75
+        },
+        storedHash: {
+            twoBit: .92,
+            fourBit: .85,
+            stringCompare: .92
+        }
     }
 }

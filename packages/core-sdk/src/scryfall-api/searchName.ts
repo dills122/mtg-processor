@@ -21,10 +21,7 @@ export async function SearchByNameExact(exact) {
         if (!response || _.isEmpty(response)) {
             throw new Error('Unable to contact endpoint, no response');
         }
-        console.log('response');
-        console.log(response);
         const resp: any = JSON.parse(response);
-        console.log(resp);
         const cards: Array<any> = resp.data;
         if (cards.length <= 0) {
             return [];

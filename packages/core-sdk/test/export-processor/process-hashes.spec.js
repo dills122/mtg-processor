@@ -5,12 +5,12 @@ const {
 const sinon = require("sinon");
 const ProcessHashes = require("../../src/export-processor/").ProcessHashes;
 const CardHashes = require("../../src/rds").CardHashes;
-const Hash = require("../../src/image-hashing").Hash;
+const Hash = require("../../src/image-hashing").default.Hash;
 const _ = require("lodash");
 
 const FAKE_HASH = "THISISANEXAMPLEOFAFAKEHASHEEEEEE";
 const CLOSE_DIFF_HASH = "THISISANEXAMPLEOFAFAKAHASHEEEEEE";
-const FAR_DIFF_HASH = "THISISANEXAMPLEOFAHASHAADDEEDD";
+const FAR_DIFF_HASH = "THISISANEXAMPLEOFAHASHAADDEEDDVV";
 const FAKE_SET = "FAKESET";
 
 const FakeCards = [{
@@ -80,9 +80,9 @@ describe("Integration::", () => {
         });
 
         it("Should execute happy path for compareRemoteHashes", (done) => {
-            stubs.hashImageStub = sandbox.stub(Hash, "HashImage")
-                .onFirstCall().callsArgWith(1, null, CLOSE_DIFF_HASH)
-                .onSecondCall().callsArgWith(1, null, FAKE_HASH);
+            stubs.hashImageStub = sandbox.stub(Hash, "hashImage")
+                .onFirstCall().resolves(CLOSE_DIFF_HASH)
+                .onSecondCall().resolves(FAKE_HASH);
 
             let hasher = ProcessHashes.create({
                 cards: FakeCards,
@@ -101,9 +101,9 @@ describe("Integration::", () => {
         });
 
         it("Should return no results for compareRemoteHashes", (done) => {
-            stubs.hashImageStub = sandbox.stub(Hash, "HashImage")
-                .onFirstCall().callsArgWith(1, null, CLOSE_DIFF_HASH)
-                .onSecondCall().callsArgWith(1, null, FAKE_HASH);
+            stubs.hashImageStub = sandbox.stub(Hash, "hashImage")
+                .onFirstCall().resolves(CLOSE_DIFF_HASH)
+                .onSecondCall().resolves(FAKE_HASH);
 
             let hasher = ProcessHashes.create({
                 cards: FakeCards,
