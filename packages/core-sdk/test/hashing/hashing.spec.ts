@@ -1,16 +1,28 @@
-import Hashing, { dependencies } from '../../src/image-hashing/hash-image';
+// import Hashing, { dependencies } from '../../src/image-hashing/hash-image';
+import proxyquire from 'proxyquire';
+import { imageHash } from 'image-hash';
 import { assert, expect } from 'chai';
 import sinon from 'sinon';
+
+const dep = {
+    imageHash
+};
 
 describe('Hashing::', () => {
     const url = 'https://img.scryfall.com/cards/normal/en/shm/53.jpg?1517813031';
     const fakeHash = '0773063f063f36070e070a070f378e7f1f000fff0fff020103f00ffb0f810ff0';
     let stubs: any = {};
     let sandbox: sinon.SinonSandbox;
+    let Hashing: any;
     describe('ImageHashing::', () => {
         beforeEach(() => {
             sandbox = sinon.createSandbox();
-            stubs.imageHashStub = sandbox.stub(dependencies, 'imageHash').callsArgWith(3, null, fakeHash);
+            stubs.imageHashStub = sandbox.stub(dep, 'imageHash').callsArgWith(3, null, fakeHash);
+            Hashing = proxyquire('../../src/image-hashing/hash-image', {
+                'image-hash': {
+                    imageHash: stubs.imageHashStub
+                }
+            });
         });
         afterEach(() => {
             sandbox.restore();
@@ -27,7 +39,7 @@ describe('Hashing::', () => {
 
         it('Should error out if image hash encounters an error', (done) => {
             stubs.imageHashStub.restore();
-            stubs.imageHashStub = sinon.stub(dependencies, 'imageHash').callsArgWith(3, new Error('TEST'), null);
+            stubs.imageHashStub = sinon.stub().callsArgWith(3, new Error('TEST'), null);
             Hashing.hashImage('').then((_hash) => {
                 return done();
             }).catch((err) => {
@@ -36,10 +48,10 @@ describe('Hashing::', () => {
                 return done();
             });
         });
-        
+
         it('Should error out if no data is returned from imageHash', (done) => {
             stubs.imageHashStub.restore();
-            stubs.imageHashStub = sinon.stub(dependencies, 'imageHash').callsArgWith(3, null, '');
+            stubs.imageHashStub = sinon.stub().callsArgWith(3, null, '');
             Hashing.hashImage('').then((_hash) => {
                 return done();
             }).catch((err) => {

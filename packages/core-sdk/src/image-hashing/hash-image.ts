@@ -12,8 +12,7 @@ const logger = new Logger({
 
 export default {
     hashImage,
-    compareHash,
-    dependencies
+    compareHash
 };
 
 /**
