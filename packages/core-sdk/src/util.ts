@@ -11,7 +11,7 @@ export function cleanString(string: string): string {
     return cleanedString;
 }
 
-export function requireF(modulePath): NodeModule | false { // force require
+export function requireF(modulePath): NodeRequire | false { // force require
     try {
         return require(modulePath);
     } catch (e) {
