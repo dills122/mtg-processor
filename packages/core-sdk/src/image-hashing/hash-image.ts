@@ -3,17 +3,13 @@ import { imageHash } from 'image-hash';
 import { Buffer } from 'buffer';
 import stringSimilarity from 'string-similarity';
 import Logger from '../logger/log';
-export const dependencies = {
-    imageHash
-};
 const logger = new Logger({
     isPretty: true
 });
 
 export default {
     hashImage,
-    compareHash,
-    dependencies
+    compareHash
 };
 
 /**
@@ -22,7 +18,7 @@ export default {
  */
 export async function hashImage(input: string | Buffer): Promise<string> {
     return new Promise((resolve, reject) => {
-        dependencies.imageHash(Buffer.isBuffer(input) ? { data: input } : input, 16, true, (error, data) => {
+        imageHash(Buffer.isBuffer(input) ? { data: input } : input, 16, true, (error, data) => {
             if (error) {
                 return reject(error);
             }
