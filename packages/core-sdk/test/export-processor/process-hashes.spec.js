@@ -4,7 +4,7 @@ const {
 } = require("chai");
 const sinon = require("sinon");
 const ProcessHashes = require("../../src/export-processor/").ProcessHashes;
-const CardHashes = require("../../src/rds").CardHashes;
+const CardHashes = require("../../src/rds").default.CardHash;
 const Hash = require("../../src/image-hashing").default.Hash;
 const _ = require("lodash");
 
@@ -31,7 +31,7 @@ describe("Integration::", () => {
         let stubs = {};
 
         beforeEach(() => {
-            stubs.getHashesStub = sandbox.stub(CardHashes, "GetHashes").callsArgWith(1, null, [{
+            stubs.getHashesStub = sandbox.stub(CardHashes.prototype, 'getHashes').callsArgWith(1, null, [{
                 cardHash: FAKE_HASH,
                 setName: FAKE_SET
             }]);

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     name: {
         heightPercent: .0585,
         widthPercent: .755,

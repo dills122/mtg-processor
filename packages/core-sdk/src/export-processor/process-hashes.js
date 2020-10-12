@@ -8,7 +8,7 @@ const joi = require("@hapi/joi");
 const config = require('../config').default;
 
 const dependencies = {
-    CardHashes: require("../rds").CardHashes,
+    CardHashes: require("../rds").default.CardHash,
     Hash: require("../image-hashing").default.Hash
 };
 
@@ -32,10 +32,8 @@ class ProcessHashes {
 
     compareDbHashes(callback) {
         this.logger.info(`process-hashes::compareDbHashes: Compare DB Hashes`);
-        dependencies.CardHashes.GetHashes(this.name, (err, hashes) => {
-            if (err) {
-                return callback(err);
-            }
+        const hashes = new dependencies.CardHashes();
+        hashes.getHashes(this.name).then((hashes) => {
             let matches = [];
             hashes.forEach((dbHash) => {
                 let compareResults = dependencies.Hash.compareHash(this.localHash, dbHash.cardHash);
@@ -56,6 +54,8 @@ class ProcessHashes {
                 });
             }
             return callback(null, matches);
+        }).catch((err) => {
+            return callback(err);
         });
     }
 
