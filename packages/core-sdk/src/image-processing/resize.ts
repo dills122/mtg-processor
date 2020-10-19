@@ -6,8 +6,6 @@ import {
 } from './util';
 import jimp from 'jimp';
 
-const constants = require('./constants');
-
 function isBuffer(image: string | Buffer): image is Buffer {
     if (_.isString(image)) {
         return false;
@@ -15,9 +13,7 @@ function isBuffer(image: string | Buffer): image is Buffer {
     return true;
 };
 
-const { height: heightMinimum, width: widthMinimum } = constants.minimumDimensions;
-
-export async function getImageSnippet(image: string | Buffer, type: string) {
+export async function getImageSnippet(image: string | Buffer, type: string, shouldExport = false) {
     try {
         let jimpImage: jimp;
         const dimensions = getImageDimensions(image);
@@ -32,50 +28,22 @@ export async function getImageSnippet(image: string | Buffer, type: string) {
             .contrast(.730)
             .brightness(.235)
             .blur(1);
+        if (shouldExport) {
+            await exportImageSnippet(jimpImage);
+        }
         return await jimpImage.getBufferAsync("image/jpeg"); //TDOO make more flexible
     } catch (err) {
-        
+        throw err;
     }
 };
 
-// export async function getImageSnippetFile(imgPath, type) {
-//     let path = `${uuid()}.${imgPath.split('.')[1] || '.jpg'}`;
-//     let dimensions = await GetImageDimensions(imgPath);
-//     if (dimensions.width < widthMinimum && dimensions.height < heightMinimum) {
-//         throw new Error("Image is to small");
-//     }
-//     let alteredDimensions = GetAlteredDimensions(dimensions, type);
-//     img = cropper(await jimp.read(imgPath), alteredDimensions, type);
-//     await img.writeAsync(path);
-//     return path;
-// }
-
-// async function GetImageSnippetTmpFile(imgPath, directory, type) {
-//     if (dimensions.width < widthMinimum && dimensions.height < heightMinimum) {
-//         throw new Error("Image is to small");
-//     }
-//     let path = `${directory}\\${uuid()}.${imgPath.split('.')[1] || '.jpg'}`;
-//     let dimensions = await GetImageDimensions(imgPath);
-//     let alteredDimensions = GetAlteredDimensions(dimensions, type);
-//     const img = cropper(await jimp.read(imgPath), alteredDimensions, type);
-//     await img.writeAsync(path);
-//     return path;
-// }
-
-function cropper(img, dimensions, type) {
-    if (type !== 'art' || type !== 'flavor') {
-        return img.crop(dimensions.left, dimensions.top, dimensions.width, dimensions.height)
-            .greyscale()
-            .contrast(.730)
-            .brightness(.235)
-            .blur(1);
-    } else {
-        return img.crop(dimensions.left, dimensions.top, dimensions.width, dimensions.height)
-            .contrast(.730)
-            .brightness(.235)
-            .blur(1);
+async function exportImageSnippet(jimpImage: jimp) {
+    try {
+        await jimpImage.write(`${uuid()}.${jimpImage.getExtension() || '.jpg'}`);
+    } catch (err) {
+        console.error(err);
     }
-}
+};
 
 export default {
     getImageSnippet
