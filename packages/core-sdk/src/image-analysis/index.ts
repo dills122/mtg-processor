@@ -1,5 +1,9 @@
-import extractText from './extract-text';
+import textExtraction from './extract-text';
+
+export {
+    textExtraction
+}
 
 export default {
-    textExtraction: extractText
+    textExtraction
 };
