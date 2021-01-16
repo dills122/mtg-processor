@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import joi from '@hapi/joi';
 import Logger from '../logger/log';
 import resize from './resize';
 import { textExtraction } from '../image-analysis';
@@ -9,24 +8,28 @@ const dependencies = {
     textExtraction
 };
 
-const schema = joi.object().keys({
-    image: joi.alternatives(joi.string(), joi.object()).required(),
-    type: joi.string().required(),
-    shouldExport: joi.bool().optional(),
-    logger: joi.object().optional()
-});
+export interface ImageProcessorArgs {
+    image: Buffer,
+    type: String,
+    shouldExport?: boolean,
+    logger?: Logger
+};
+
+export interface ExtractionResults {
+    dirtyText: any;
+    cleanText: string;
+}
 
 export default class ImageProcessor {
     logger: Logger;
     imageSnippet: Buffer;
-    image: string | Buffer;
+    image: Buffer;
     type: string;
     shouldExport: boolean | undefined;
-    extractionResults: { dirtyText: any; cleanText: string; }; //TODO update with proper interface type
+    extractionResults: ExtractionResults;
 
-    constructor(params = {}) {
-        let validatedSchema = joi.attempt(params, schema);
-        _.assign(this, validatedSchema);
+    constructor(args: ImageProcessorArgs) {
+        _.assign(this, args);
         if (!this.logger) {
             this.logger = new Logger({
                 isPretty: false
@@ -39,7 +42,6 @@ export default class ImageProcessor {
             await this.cropImage();
             await this.extractText();
         } catch (err) {
-            //TODO update final error handling
             throw err;
         }
     }
@@ -57,7 +59,7 @@ export default class ImageProcessor {
             if (_.isString(this.image)) {
                 throw new Error('Currently not supported'); //TODO fix
             }
-            this.extractionResults = await dependencies.textExtraction.ScanImage(this.image);
+            this.extractionResults = await dependencies.textExtraction.ScanImage(this.imageSnippet || this.image);
         } catch (err) {
             throw err;
         }

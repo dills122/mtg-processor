@@ -10,7 +10,7 @@ describe('FuzzyMatching::', () => {
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
-        bulkNamesStub = sandbox.stub(dependencies, "GetNames").callsArgWith(0, null, mock);
+        bulkNamesStub = sandbox.stub(dependencies, "GetNames").resolves(mock);
     });
     afterEach(() => {
         sinon.restore();
