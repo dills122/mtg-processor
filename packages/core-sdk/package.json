@@ -48,10 +48,10 @@
     "temp-dir": "^2.0.0",
     "tesseract.js": "^2.1.1",
     "tmp": "^0.1.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "yup": "^0.32.8"
   },
   "devDependencies": {
-    "@hapi/joi": "^15.0.3",
     "@types/assert": "^1.5.1",
     "@types/bunyan": "^1.8.6",
     "@types/chai": "^4.2.12",

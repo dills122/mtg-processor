@@ -2,7 +2,7 @@ import { createConnection, Connection } from 'mysql';
 import { requireF } from '../util';
 
 export interface RDSBaseArgs {
-    secureConfig: SecureConfig
+    secureConfig?: SecureConfig
 };
 
 export interface SecureConfig {

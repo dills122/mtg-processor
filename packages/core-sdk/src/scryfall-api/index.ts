@@ -5,3 +5,7 @@ export default {
     GetCardNames,
     Search
 };
+export {
+    GetCardNames,
+    Search
+};

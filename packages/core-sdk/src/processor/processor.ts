@@ -2,10 +2,12 @@ import _ from 'lodash';
 import Logger from '../logger/log';
 import { ImageProcessor } from '../image-processing';
 import { MatchName } from '../fuzzy-matching';
+import { CardCollection } from '../models';
 
 const dependencies = {
     ImageProcessor,
-    MatchName: MatchName.default
+    MatchName: MatchName.default,
+    CardCollection
 };
 
 export interface ProcessorArgs {
@@ -18,7 +20,7 @@ export default class Processor {
     file: Buffer;
     nameMatchResults: MatchName.MatchResults[] = [];
 
-    constructor(args : ProcessorArgs) {
+    constructor(args: ProcessorArgs) {
         _.assign(this, args);
         if (!this.logger) {
             this.logger = new Logger({
@@ -28,6 +30,13 @@ export default class Processor {
     }
 
     async execute() {
+        try {
+            const nameMatchResult = await this.executeNameMatching();
+            //TODO Create process for checking against hashes
+        }
+    }
+
+    async executeNameMatching() {
         try {
             const nameImageProcessorInst = new dependencies.ImageProcessor({
                 logger: this.logger,
@@ -44,23 +53,24 @@ export default class Processor {
                 this.logger.warn('Unable to gather any match results', {
                     ...nameExtractionResults
                 });
-                return;
+                throw Error('No matching results found, unable to proceed');
             }
             if (this.nameMatchResults.length > 1) {
                 this.logger.info('Found multiple name match results, executing needs attention route', {
                     ...nameExtractionResults,
                     nameMatchResults: this.nameMatchResults
                 });
-                return await this.executeNeedsAttention(this.nameMatchResults);
+                //TODO update with another way to handle and sift through multiple name matching results
+                return this.nameMatchResults[0];
             }
             this.logger.info('Found single name match, executing collection route', {
                 ...nameExtractionResults,
                 nameMatchResults: this.nameMatchResults
             });
-            return await this.executeCollection(this.nameMatchResults);
+            return this.nameMatchResults[0];
         } catch (err) {
             this.logger.error('Error processing card', err);
-            // process.exit(1);
+            throw err;
         }
     }
 
@@ -69,7 +79,7 @@ export default class Processor {
             nameMatchResults
         });
     }
-    
+
     async executeCollection(nameMatchResults: MatchName.MatchResults[]): Promise<void> {
         this.logger.info('%%%', {
             nameMatchResults
