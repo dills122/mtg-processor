@@ -25,6 +25,7 @@ export function getImageDimensions(image: string | Buffer): Dimensions {
     };
 };
 
+//TODO Imprv: make 'type' a typed value to avoid issues 
 export function getAlteredDimensions(dimensions: Dimensions, type: string): AlteredDimensions {
     switch (type) {
         case 'name':

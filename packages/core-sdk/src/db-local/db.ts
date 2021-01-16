@@ -6,6 +6,10 @@ const db = new Datastore({
     autoload: true
 });
 
-module.exports = {
+export default {
     db
-}
+};
+
+export {
+    db
+};

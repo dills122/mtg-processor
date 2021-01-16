@@ -5,3 +5,8 @@ export default {
     MatchType,
     MatchName
 };
+
+export {
+    MatchType,
+    MatchName
+};
