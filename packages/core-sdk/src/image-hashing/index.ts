@@ -5,3 +5,8 @@ export default {
     Hash,
     Base64
 };
+
+export {
+    Hash,
+    Base64
+};
