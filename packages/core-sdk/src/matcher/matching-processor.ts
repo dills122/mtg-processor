@@ -3,12 +3,11 @@ import _ from 'lodash';
 import Logger from '../logger/log';
 import { Search } from '../scryfall-api';
 import { Hash } from '../image-hashing';
-import async from 'async';
-const ProcessHashes = require('../export-processor');
+import { HashComparer } from '../hash-comparer';
 
 const dependencies = {
     Searcher: Search.SearchList,
-    HashProcessor: ProcessHashes,
+    HashComparer,
     Hash: Hash
 };
 
@@ -69,39 +68,20 @@ export default class MatcherProcessor {
     }
 
     async processMultiSetMatches() {
-        return new Promise((resolve, reject) => {
-            let processHashes = dependencies.HashProcessor.create({
-                name: this.cardName,
+        try {
+            const hashComparer = new dependencies.HashComparer({
+                cardName: this.cardName,
                 cards: this.cardObjects,
                 localHash: this.localHash,
-                queryingEnabled: false //TODO overhaul this 
+                logger: this.logger
             });
-            this.logger.info("Processing multi set matches");
-            //TODO refactor the hash processor to get rid of async lib
-            async.parallel([
-                (cb) => {
-                    async.waterfall([
-                        (next) => processHashes.compareDbHashes(next),
-                        this.processHashResults
-                    ], cb);
-                },
-                (cb) => {
-                    async.waterfall([
-                        (next) => processHashes.compareRemoteImages(next),
-                        this.processHashResults
-                    ], cb);
-                }
-            ], (err, finalResults) => {
-                if (err) {
-                    return reject(err);
-                }
-                let [db, remote] = finalResults;
-                let mergedResults = db.concat(remote);
-                this.matchResults = new Set(mergedResults);
+            //TODO finish refactoring this
+            //The hash results are here now
+            await hashComparer.compare('remote');
+            await hashComparer.compare('database');
+        } catch (err) {
 
-                return resolve(this.matchResults);
-            });
-        });
+        }
     }
 
     processHashResults(hashResults, callback) {

@@ -17,7 +17,7 @@ export interface IGetHashes {
 };
 
 export default class CardHash extends Base {
-    constructor(args) {
+    constructor(args?) {
         super(args);
     }
 

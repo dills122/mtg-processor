@@ -1,5 +1,4 @@
 import * as LocalDB from './db-local';
-import * as Exporter from './export-processor';
 import * as FuzzyMatching from './fuzzy-matching';
 import * as ImageAnalysis from './image-analysis';
 import * as ImageHashing from './image-hashing';
@@ -10,12 +9,12 @@ import * as Models from './models';
 import * as Processor from './processor';
 import * as RDS from './rds';
 import * as ScryfallApi from './scryfall-api';
-import * as BackFiller from './back-filler';
 import * as FileIO from './file-io';
+import HashComparer from './hash-comparer';
+const BackFiller = require('./back-filler');
 
 export default {
     LocalDB,
-    Exporter,
     FuzzyMatching,
     ImageAnalysis,
     ImageHashing,
@@ -27,5 +26,6 @@ export default {
     RDS,
     ScryfallApi,
     BackFiller,
-    FileIO
+    FileIO,
+    HashComparer
 };
