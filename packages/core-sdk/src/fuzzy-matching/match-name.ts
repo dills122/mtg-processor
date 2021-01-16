@@ -66,7 +66,7 @@ export default class MatchName {
         return _.map(initialResults || this.initialResults, (match) => {
             let [namePercent, nameMatch] = match;
             return {
-                name: nameMatch,
+                name: String(nameMatch),
                 percentage: namePercent
             };
         });
@@ -94,7 +94,7 @@ export interface NameRecords {
 };
 
 export interface MatchResults {
-    name: string | number,
+    name: string,
     percentage: string | number
 };
 

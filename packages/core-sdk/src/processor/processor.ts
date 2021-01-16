@@ -3,11 +3,13 @@ import Logger from '../logger/log';
 import { ImageProcessor } from '../image-processing';
 import { MatchName } from '../fuzzy-matching';
 import { CardCollection } from '../models';
+import { MatchProcessor } from '../matcher';
 
 const dependencies = {
     ImageProcessor,
     MatchName: MatchName.default,
-    CardCollection
+    CardCollection,
+    MatchProcessor
 };
 
 export interface ProcessorArgs {
@@ -33,6 +35,15 @@ export default class Processor {
         try {
             const nameMatchResult = await this.executeNameMatching();
             //TODO Create process for checking against hashes
+            const matcherResults = await new dependencies.MatchProcessor({
+                cardName: nameMatchResult.name,
+                file: this.file,
+                logger: this.logger
+            }).execute();
+            //TODO decide which model will it be added too
+        } catch (err) {
+            this.logger.error(err);
+            return;
         }
     }
 

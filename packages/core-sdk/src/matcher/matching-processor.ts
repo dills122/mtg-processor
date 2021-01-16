@@ -4,6 +4,7 @@ import Logger from '../logger/log';
 import { Search } from '../scryfall-api';
 import { Hash } from '../image-hashing';
 import { HashComparer } from '../hash-comparer';
+import { HashComparisonResults } from '../hash-comparer/remoteHashes';
 
 const dependencies = {
     Searcher: Search.SearchList,
@@ -42,19 +43,23 @@ export default class MatcherProcessor {
         }
     }
 
+    //TODO this output should be updated to export more data from the API call on the final result
     async execute() {
         try {
             this.cardObjects = await dependencies.Searcher(this.cardName);
             switch (this.cardObjects.length) {
                 case 0:
-                    return null;
+                    return [];
                 case 1:
-                    return this.cardObjects[0];
+                    //TODO this needs updated for proper mapping
+                    return this.mapFinalResults([this.cardObjects[0]]);
                 default:
                     await this.hashLocalCard();
+                    return await this.processMultiSetMatches();
             }
         } catch (err) {
-
+            this.logger.error(err);
+            return [];
         }
     }
 
@@ -75,24 +80,23 @@ export default class MatcherProcessor {
                 localHash: this.localHash,
                 logger: this.logger
             });
-            //TODO finish refactoring this
-            //The hash results are here now
-            await hashComparer.compare('remote');
-            await hashComparer.compare('database');
+            const remoteHashResults = await hashComparer.compare('remote');
+            if (remoteHashResults.length === 1) {
+                return this.mapFinalResults([remoteHashResults[0]]);
+            }
+            const databaseHashResults = await hashComparer.compare('database');
+            const filteredResults = _.uniqBy([...remoteHashResults, ...databaseHashResults], 'setName');
+            if (filteredResults.length <= 0) {
+                return [];
+            }
+            return this.mapFinalResults(filteredResults);
         } catch (err) {
-
+            this.logger.error(err);
+            return [];
         }
     }
 
-    processHashResults(hashResults, callback) {
-        if (_.isEmpty(hashResults)) {
-            return callback(null, []); //No set to return
-        }
-
-        if (hashResults.length > 1) {
-            return callback(null, _.map(hashResults, "setName"));
-        }
-        let matchObject = hashResults[0] || {};
-        return callback(null, [_.get(matchObject, "setName", "")]);
+    mapFinalResults(collection: Array<HashComparisonResults>) {
+        return _.map(collection, 'setName');
     }
 };
