@@ -1,9 +1,7 @@
 import _ from 'lodash';
-import async from 'async';
-import joi from '@hapi/joi';
 import FuzzySet from 'fuzzyset.js';
 import Logger from '../logger/log';
-const GetBulkNames = require('../db-local/index').GetBulkNames;
+import { GetNames } from '../db-local';
 
 const config = {
     highConfidence: .95,
@@ -12,14 +10,8 @@ const config = {
 };
 
 export const dependencies = {
-    GetNames: GetBulkNames
+    GetNames: GetNames.GetBulkNames
 };
-
-const schema = joi.object().keys({
-    cleanText: joi.string().required(),
-    dirtyText: joi.string().optional(),
-    logger: joi.object().optional()
-});
 
 export function filterNames(names: Array<NameRecords>): Array<string> {
     return names.map((record) => {
@@ -31,78 +23,84 @@ export default class MatchName {
     logger: Logger;
     cleanText: string;
     dirtyText: string;
-    initialResults: Array<Array<number | string>> | null;
-    finalResults: { name: string | number; percentage: string | number; }[];
+    initialResults: FuzzySetResults;
+    isPretty: boolean;
+    filteredMatchResults: MatchResults[];
 
-    constructor(params) {
-        let validated = joi.attempt(params, schema);
-        _.assign(this, validated);
+    constructor(args: MatchNameArgs) {
+        _.assign(this, args);
         if (!this.logger) {
             this.logger = new Logger({
-                isPretty: false
+                isPretty: this.isPretty
             });
         }
     }
 
-    async Match(): Promise<MatchResults | Array<MatchResults>> {
-        return new Promise((resolve, reject) => {
-            async.waterfall([
-                (next) => this.gatherInitialResults(next),
-                (next) => this.filterBulkMatches(next),
-            ], (err) => {
-                if (err) {
-                    return reject(err);
-                }
-                if(this.finalResults) {
-                    return resolve(this.finalResults);
-                }
-            });
-        });
+    async Match(): Promise<Array<MatchResults>> {
+        try {
+            await this.gatherInitialResults();
+            const mappedMatchResults = this.remapFuzzyData();
+            this.filteredMatchResults = this.filterBulkMatches(mappedMatchResults);
+            return this.filteredMatchResults;
+        } catch (err) {
+            this.logger.error(err);
+            return [];
+        }
     }
 
-    gatherInitialResults(callback) {
-        dependencies.GetNames((err, names) => {
-            if (err) {
-                return callback(err);
-            }
+    async gatherInitialResults() {
+        try {
+            const names = await dependencies.GetNames();
             let filteredNames = filterNames(names);
-            if(!filterNames || _.isEmpty(filteredNames)) {
-                return callback(new Error('No Names found to add to fuzzy set'));
+            if (!filterNames || _.isEmpty(filteredNames)) {
+                throw Error('No Names found to add to fuzzy set');
             }
             let fuzzy = FuzzySet(filteredNames);
             this.initialResults = fuzzy.get(this.cleanText);
-            return callback();
-        });
+        } catch (err) {
+            throw err;
+        }
     }
 
-    filterBulkMatches(callback): void {
-        let fixedResults = _.map(this.initialResults, (match) => {
+    remapFuzzyData(initialResults?: FuzzySetResults) {
+        return _.map(initialResults || this.initialResults, (match) => {
             let [namePercent, nameMatch] = match;
             return {
-                name: nameMatch,
+                name: String(nameMatch),
                 percentage: namePercent
             };
         });
+    }
 
-        let highConfidenceMatches = _.filter(fixedResults, (item) => {
+    filterBulkMatches(matchData: Array<MatchResults>) {
+        let highConfidenceMatches = _.filter(matchData, (item) => {
             return Number(item.percentage) >= config.highConfidence;
         });
 
         if (highConfidenceMatches.length > 1) {
-            return callback(null, highConfidenceMatches.splice(0, config.maxMatches + 1));
+            return highConfidenceMatches.splice(0, config.maxMatches + 1);
         }
-        this.finalResults = _.filter(fixedResults, (item) => {
+        let lesserMatches = _.filter(matchData, (item) => {
             return Number(item.percentage) >= config.minConfidence;
-        }).splice(0, config.maxMatches + 1);
-        return callback(null, this.finalResults);
+        });
+        return lesserMatches;
     }
-}
+};
+
+type FuzzySetResults = Array<Array<number | string>> | null;
 
 export interface NameRecords {
     name: string;
 };
 
 export interface MatchResults {
-    name: string | number,
+    name: string,
     percentage: string | number
+};
+
+export interface MatchNameArgs {
+    cleanText: string,
+    dirtyText?: string,
+    logger?: Logger,
+    isPretty?: boolean
 };

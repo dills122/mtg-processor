@@ -10,6 +10,7 @@ CREATE TABLE Card_Catalog (
     Automated BIT,
     MagicID int,
     ImageUrl varchar(150) NOT NULL,
+    ImageType varchar(25) NOT NULL,
     CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     UpdatedAt DATETIME ON UPDATE CURRENT_TIMESTAMP,
     CreatedBy varchar(25) NOT NULL,

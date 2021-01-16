@@ -46,7 +46,7 @@ export default class Logger {
         }
     }
 
-    error(message: string, object?: object) {
+    error(message: string | Error, object?: object) {
         if (this.bunyan) {
             this.bunyan.error(`${message}`);
             if (object) {

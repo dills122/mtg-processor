@@ -14,7 +14,7 @@ export default {
 
 /**
  * Hash image
- * @param {string | Buffer } input - image to hash
+ * @param {string | Buffer} input - image to hash
  */
 export async function hashImage(input: string | Buffer): Promise<string> {
     return new Promise((resolve, reject) => {
